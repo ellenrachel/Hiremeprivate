@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireMePrivate.com - Private Senior Home Care Directory</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide">HireMePrivate<span class="text-blue-300">.com</span></h1>
+            <span class="text-xs bg-blue-800 px-3 py-1 rounded-full text-blue-200">Secure Direct Directory</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-8">
+        
+        <!-- Intro Hero Section -->
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Find Independent Senior Care</h2>
+            <p class="text-slate-600 max-w-xl mx-auto">Connect directly with experienced, private home care providers in your local area without agency markups.</p>
+        </div>
+
+        <!-- Search / Filter Card -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Location / Zip</label>
+                    <input type="text" id="searchInput" placeholder="e.g. City or Zip Code" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Care Specialty</label>
+                    <select id="specialtySelect" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white">
+                        <option value="">All Care Types</option>
+                        <option value="Companion Care">Companion Care</option>
+                        <option value="Personal Care">Personal Care</option>
+                        <option value="Dementia & Alzheimer's">Dementia & Alzheimer's</option>
+                        <option value="24/7 Live-In">24/7 Live-In</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="fetchWorkers()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-150">
+                        Search Directory
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div>
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Available Care Providers</h3>
+            <div id="workerList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Dynamic cards will load here -->
+                <div class="p-6 bg-white border border-slate-200 rounded-xl text-center text-slate-500 col-span-2">
+                    Loading providers or enter your search criteria above...
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        &copy; 2026 HireMePrivate.com. All rights reserved. Direct private care connections.
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://bxuavshhpsgixsffqjtk.supabase.co';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+
+        // Initialize Supabase Client safely
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function fetchWorkers() {
+            const listContainer = document.getElementById('workerList');
+            listContainer.innerHTML = '<div class="p-6 bg-white border border-slate-200 rounded-xl text-center text-slate-500 col-span-2">Searching database...</div>';
+
+            try {
+                // Fetch active profiles from Supabase database table (e.g., 'workers')
+                let query = _supabase.from('workers').select('*');
+
+                const { data, error } = await query;
+
+                if (error) {
+                    throw error;
+                }
+
+                if (!data || data.length === 0) {
+                    listContainer.innerHTML = '<div class="p-6 bg-white border border-slate-200 rounded-xl text-center text-slate-500 col-span-2">No care providers found matching your criteria right now. Check back soon!</div>';
+                    return;
+                }
+
+                // Render cards
+                listContainer.innerHTML = '';
+                data.forEach(worker => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between';
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-bold text-lg text-slate-900">${worker.name || 'Private Caregiver'}</h4>
+                                <span class="bg-green-100 text-green-800 text-xs px-2.5 py-0.5 rounded-full font-medium">Verified Independent</span>
+                            </div>
+                            <p class="text-xs text-blue-600 font-semibold mb-2">${worker.specialty || 'General Home Care'}</p>
+                            <p class="text-sm text-slate-600 mb-4">${worker.bio || 'Experienced and dedicated senior care provider available for direct hire.'}</p>
+                        </div>
+                        <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-xs">
+                            <span class="text-slate-500">📍 ${worker.location || 'Local Area'}</span>
+                            <button onclick="alert('Unlock contact tier required to view direct phone number.')" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg font-medium transition">
+                                View Contact
+                            </button>
+                        </div>
+                    `;
+                    listContainer.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error('Error fetching workers:', err);
+                listContainer.innerHTML = '<div class="p-6 bg-white border border-red-200 rounded-xl text-center text-red-500 col-span-2">Unable to load directory records at the moment. Please verify your Supabase API key configuration.</div>';
+            }
+        }
+
+        // Auto-run on page load
+        window.onload = () => {
+            fetchWorkers();
+        };
+    </script>
+</body>
+</html>
