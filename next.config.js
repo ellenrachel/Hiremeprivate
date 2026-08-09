@@ -1,0 +1,9 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: "https://izeqpvtzcrzmcskstjlu.supabase.co",
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6ZXBxdnR6Y3J6bWNrc3Rramx1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2OTE0NjYsImV4cCI6MjEwMTI2NzQ2Nn0.EhOafB_vRg8R6lZxH-R-2g4-VwQucRETD6NELHiIBjo",
+  },
+};
+
+module.exports = nextConfig;
